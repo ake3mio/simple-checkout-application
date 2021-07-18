@@ -12,12 +12,20 @@ object SpecialPriceFactory {
             name,
             setOf(condition)
         ) {
-            BigDecimal.ZERO
+            if (it.isNotEmpty()) {
+                val basketItem = it[0]
+                val fullPrice = basketItem.product.unitPrice.times(BigDecimal(basketItem.quantity))
+                val discount = basketItem.product.unitPrice
+
+                fullPrice.minus(discount)
+            } else {
+                BigDecimal.ZERO
+            }
         }
     }
 
     fun getMealDeal(name: String, itemSkus: Set<Char>, price: BigDecimal): SpecialPrice {
         val conditions = itemSkus.map { SpecialPriceCondition(1, it) }.toSet()
-        return SpecialPrice(name, conditions) { BigDecimal.ZERO }
+        return SpecialPrice(name, conditions) { price }
     }
 }
